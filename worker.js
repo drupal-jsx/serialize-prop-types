@@ -1,4 +1,3 @@
-import { expose } from 'threads/worker';
 import PropTypes from 'prop-types';
 
 // Monkey patch PropTypes so that component prop types can be serialized to
@@ -24,15 +23,14 @@ PropTypes.arrayOf = new Proxy(PropTypes.arrayOf, {
   }
 })
 
-expose({
-  async serializePropTypes(modulePathOrPaths) {
-    const result = {};
-    const components = await import(modulePathOrPaths);
-    for (const key in components) {
-      if (components[key].propTypes) {
-        result[key] = JSON.parse(JSON.stringify(components[key].propTypes));
-      }
+self.onmessage = async (event) => {
+  const result = {};
+  const modulePathOrPaths = event.data;
+  const {default: components} = await import(modulePathOrPaths);
+  for (const key in components) {
+    if (components[key].propTypes) {
+      result[key] = JSON.parse(JSON.stringify(components[key].propTypes));
     }
-    return result;
   }
-})
+  postMessage(result);
+};
