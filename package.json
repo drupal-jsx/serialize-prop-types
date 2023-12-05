@@ -1,0 +1,10 @@
+{
+  "name": "@drupal-jsx/serialize-prop-types",
+  "type": "module",
+  "dependencies": {
+    "threads": "^1.7.0"
+  },
+  "peerDependencies": {
+    "prop-types": "^15.0.0"
+  }
+}
