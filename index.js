@@ -1,8 +1,11 @@
-import { spawn, Thread, Worker } from 'threads';
-
 export default async function serializePropTypes(modulePathOrPaths) {
-  const worker = await spawn(new Worker('./worker'));
-  const result = await worker.serializePropTypes(modulePathOrPaths);
-  await Thread.terminate(worker);
+  const workerURL = new URL('./worker.js', import.meta.url).href;
+  const worker = new Worker(workerURL);
+  worker.postMessage(modulePathOrPaths);
+  const promise = new Promise((resolve, reject) => {
+    worker.onmessage = event => { resolve(event.data) }
+  });
+  const result = await promise;
+  worker.terminate();
   return result;
 }
