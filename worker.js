@@ -26,7 +26,20 @@ PropTypes.arrayOf = new Proxy(PropTypes.arrayOf, {
 self.onmessage = async (event) => {
   const result = {};
   const modulePathOrPaths = event.data;
-  const {default: components} = await import(modulePathOrPaths);
+
+  let components;
+  if (typeof modulePathOrPaths === 'string') {
+    const module = await import(modulePathOrPaths);
+    components = module.default;
+  }
+  else {
+    components = {};
+    for (const key in modulePathOrPaths) {
+      const module = await import(modulePathOrPaths[key]);
+      components[key] = module.default;
+    }
+  }
+
   for (const key in components) {
     if (components[key].propTypes) {
       result[key] = JSON.parse(JSON.stringify(components[key].propTypes));
