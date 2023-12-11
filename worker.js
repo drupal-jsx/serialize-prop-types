@@ -18,7 +18,14 @@ PropTypes.shape = new Proxy(PropTypes.shape, {
 PropTypes.arrayOf = new Proxy(PropTypes.arrayOf, {
   apply: function (target, thisArg, argumentsList) {
     const result = target(...argumentsList);
-    result.toJSON = result.isRequired.toJSON = () => [argumentsList[0]];
+    result.toJSON = result.isRequired.toJSON = () => [ argumentsList[0] ];
+    return result;
+  }
+})
+PropTypes.objectOf = new Proxy(PropTypes.objectOf, {
+  apply: function (target, thisArg, argumentsList) {
+    const result = target(...argumentsList);
+    result.toJSON = result.isRequired.toJSON = () => ({ '*': argumentsList[0] });
     return result;
   }
 })
